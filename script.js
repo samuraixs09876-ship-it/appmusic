@@ -36,7 +36,7 @@ const songs = [
     title: "Một Nửa Sự Thật",
     artist: "24K.RIGHT",
     type: "music",
-    song_url: "https://erztaoznustolbuaxeze.supabase.co/storage/v1/object/public/songs/24K.RIGHT%20-%20MOT%20NUA%20SU%20THAT.MP3",
+    song_url: "https://erztaoznustolbuaxeze.supabase.co/storage/v1/object/public/songs/24K.RIGHT%20-%20MOT%20NUA%20SU%20THAT.mp3",
     cover_url: "https://tse4.mm.bing.net/th/id/OIP.16-B7G4zAm3BjXK9RKwiDgHaHa?r=0&pid=Api&h=220&P=0"
   },
   {
