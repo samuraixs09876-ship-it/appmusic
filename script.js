@@ -92,7 +92,6 @@ const songs = [
     title: "Tháp Trap Tự Do (Remix)",
     artist: "Lý Lữ Ca prod. tyronee",
     type: "music",
-    // Đã sửa lại URL bài hát này (xóa chữ 't' thừa ở đầu)
     song_url: "https://erztaoznustolbuaxeze.supabase.co/storage/v1/object/public/songs/thap%20trap%20tu%20do.mp3",
     cover_url: "https://tse3.mm.bing.net/th/id/OIP.9W4c65IOzFz9J6oXOxii6QHaHa?r=0&pid=Api&h=220&P=0"
   },
@@ -215,7 +214,7 @@ let currentCategory = "all";
 
 let currentUser = localStorage.getItem("currentUser") || "guest";
 
-if (currentUser !== "guest") {
+if (currentUser !== "guest" && usernameInput) {
   usernameInput.value = currentUser;
 }
 
@@ -285,9 +284,7 @@ function getSongsByCategory() {
 function getCurrentPlaylist() {
   let playlist = getSongsByCategory();
 
-  const keyword = searchInput.value
-    .toLowerCase()
-    .trim();
+  const keyword = searchInput ? searchInput.value.toLowerCase().trim() : "";
 
   if (keyword) {
     playlist = playlist.filter(song => {
@@ -309,21 +306,25 @@ function updatePageTitle() {
     liked: "Bài hát yêu thích"
   };
 
-  pageTitle.textContent = titles[currentCategory];
+  if (pageTitle) {
+    pageTitle.textContent = titles[currentCategory];
+  }
 }
 
 function renderSongs() {
   const filteredSongs = getCurrentPlaylist();
 
-  songList.innerHTML = "";
-  sidebarList.innerHTML = "";
+  if (songList) songList.innerHTML = "";
+  if (sidebarList) sidebarList.innerHTML = "";
 
   if (filteredSongs.length === 0) {
-    songList.innerHTML = `
-      <div class="empty-message">
-        Không tìm thấy bài hát phù hợp
-      </div>
-    `;
+    if (songList) {
+      songList.innerHTML = `
+        <div class="empty-message">
+          Không tìm thấy bài hát phù hợp
+        </div>
+      `;
+    }
     return;
   }
 
@@ -377,36 +378,30 @@ function renderSongs() {
       playSong();
     });
 
-    const playSongButton = songElement.querySelector(
-      ".song-play-button"
-    );
+    const playSongButton = songElement.querySelector(".song-play-button");
+    if (playSongButton) {
+      playSongButton.addEventListener("click", event => {
+        event.stopPropagation();
+        currentSongIndex = originalIndex;
+        loadSong(currentSongIndex);
+        playSong();
+      });
+    }
 
-    playSongButton.addEventListener("click", event => {
-      event.stopPropagation();
+    const favoriteSongButton = songElement.querySelector(".song-favorite-button");
+    if (favoriteSongButton) {
+      favoriteSongButton.addEventListener("click", event => {
+        event.stopPropagation();
+        toggleFavorite(song.id);
+      });
+    }
 
-      currentSongIndex = originalIndex;
-      loadSong(currentSongIndex);
-      playSong();
-    });
-
-    const favoriteSongButton = songElement.querySelector(
-      ".song-favorite-button"
-    );
-
-    favoriteSongButton.addEventListener("click", event => {
-      event.stopPropagation();
-      toggleFavorite(song.id);
-    });
-
-    songList.appendChild(songElement);
+    if (songList) songList.appendChild(songElement);
 
     const sidebarItem = document.createElement("div");
-
     sidebarItem.className = "sidebar-song";
-
     sidebarItem.innerHTML = `
       <img src="${song.cover_url}" alt="${song.title}">
-
       <div>
         <strong>${song.title}</strong>
         <span>${song.artist}</span>
@@ -419,7 +414,7 @@ function renderSongs() {
       playSong();
     });
 
-    sidebarList.appendChild(sidebarItem);
+    if (sidebarList) sidebarList.appendChild(sidebarItem);
   });
 
   updateActiveSong();
@@ -433,17 +428,18 @@ function loadSong(index) {
     return;
   }
 
-  title.textContent = song.title;
-  artist.textContent = song.artist;
-  cover.src = song.cover_url;
+  if (title) title.textContent = song.title;
+  if (artist) artist.textContent = song.artist;
+  if (cover) cover.src = song.cover_url;
   
-  // Tải lại nhạc đúng chuẩn cho Mobile
-  audio.src = song.song_url;
-  audio.load();
+  if (audio) {
+    audio.src = song.song_url;
+    audio.load();
+  }
 
-  currentTimeElement.textContent = "0:00";
-  durationElement.textContent = "0:00";
-  progress.style.width = "0%";
+  if (currentTimeElement) currentTimeElement.textContent = "0:00";
+  if (durationElement) durationElement.textContent = "0:00";
+  if (progress) progress.style.width = "0%";
 
   updateActiveSong();
   updatePlayerFavorite();
@@ -475,7 +471,7 @@ function updateActiveSong() {
 function updatePlayerFavorite() {
   const song = songs[currentSongIndex];
 
-  if (!song) {
+  if (!song || !playerFavoriteButton) {
     return;
   }
 
@@ -488,32 +484,30 @@ function updatePlayerFavorite() {
   playerFavoriteButton.classList.toggle("liked", liked);
 }
 
-// Xử lý phát bài hát an toàn trên Mobile
 function playSong() {
+  if (!audio) return;
   const playPromise = audio.play();
 
   if (playPromise !== undefined) {
     playPromise
       .then(() => {
         isPlaying = true;
-        playButton.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+        if (playButton) playButton.innerHTML = `<i class="fa-solid fa-pause"></i>`;
       })
       .catch(error => {
-        console.log("Không thể phát nhạc tự động trên trình duyệt di động:", error);
+        console.log("Không thể phát nhạc tự động trên trình duyệt:", error);
         isPlaying = false;
-        playButton.innerHTML = `<i class="fa-solid fa-play"></i>`;
+        if (playButton) playButton.innerHTML = `<i class="fa-solid fa-play"></i>`;
       });
   }
 }
 
 function pauseSong() {
   isPlaying = false;
-
-  playButton.innerHTML = `
-    <i class="fa-solid fa-play"></i>
-  `;
-
-  audio.pause();
+  if (playButton) {
+    playButton.innerHTML = `<i class="fa-solid fa-play"></i>`;
+  }
+  if (audio) audio.pause();
 }
 
 function playNextSong() {
@@ -533,9 +527,7 @@ function playNextSong() {
     nextPlaylistIndex = 0;
   }
 
-  currentSongIndex = songs.indexOf(
-    playlist[nextPlaylistIndex]
-  );
+  currentSongIndex = songs.indexOf(playlist[nextPlaylistIndex]);
 
   loadSong(currentSongIndex);
   playSong();
@@ -554,16 +546,11 @@ function playPreviousSong() {
 
   let previousPlaylistIndex = currentPlaylistIndex - 1;
 
-  if (
-    previousPlaylistIndex < 0 ||
-    currentPlaylistIndex === -1
-  ) {
+  if (previousPlaylistIndex < 0 || currentPlaylistIndex === -1) {
     previousPlaylistIndex = playlist.length - 1;
   }
 
-  currentSongIndex = songs.indexOf(
-    playlist[previousPlaylistIndex]
-  );
+  currentSongIndex = songs.indexOf(playlist[previousPlaylistIndex]);
 
   loadSong(currentSongIndex);
   playSong();
@@ -583,8 +570,7 @@ function playRandomSong() {
     randomSong = playlist[0];
   } else {
     do {
-      randomSong =
-        playlist[Math.floor(Math.random() * playlist.length)];
+      randomSong = playlist[Math.floor(Math.random() * playlist.length)];
     } while (songs.indexOf(randomSong) === currentSongIndex);
   }
 
@@ -597,121 +583,132 @@ function playRandomSong() {
 function toggleShuffle() {
   isShuffle = !isShuffle;
 
-  shuffleButton.classList.toggle("active", isShuffle);
-  shuffleControl.classList.toggle("active", isShuffle);
+  if (shuffleButton) shuffleButton.classList.toggle("active", isShuffle);
+  if (shuffleControl) shuffleControl.classList.toggle("active", isShuffle);
 }
 
 function toggleRepeat() {
   isRepeat = !isRepeat;
-  repeatButton.classList.toggle("active", isRepeat);
+  if (repeatButton) repeatButton.classList.toggle("active", isRepeat);
 }
 
-playButton.addEventListener("click", () => {
-  if (isPlaying) {
-    pauseSong();
-  } else {
-    playSong();
-  }
-});
+if (playButton) {
+  playButton.addEventListener("click", () => {
+    if (isPlaying) {
+      pauseSong();
+    } else {
+      playSong();
+    }
+  });
+}
 
-prevButton.addEventListener("click", playPreviousSong);
-nextButton.addEventListener("click", playNextSong);
+if (prevButton) prevButton.addEventListener("click", playPreviousSong);
+if (nextButton) nextButton.addEventListener("click", playNextSong);
 
-shuffleButton.addEventListener("click", () => {
-  isShuffle = true;
-
-  shuffleButton.classList.add("active");
-  shuffleControl.classList.add("active");
-
-  playRandomSong();
-});
-
-shuffleControl.addEventListener("click", () => {
-  toggleShuffle();
-
-  if (isShuffle) {
+if (shuffleButton) {
+  shuffleButton.addEventListener("click", () => {
+    isShuffle = true;
+    shuffleButton.classList.add("active");
+    if (shuffleControl) shuffleControl.classList.add("active");
     playRandomSong();
-  }
-});
+  });
+}
 
-repeatButton.addEventListener("click", toggleRepeat);
+if (shuffleControl) {
+  shuffleControl.addEventListener("click", () => {
+    toggleShuffle();
+    if (isShuffle) {
+      playRandomSong();
+    }
+  });
+}
 
-playAllButton.addEventListener("click", () => {
-  const playlist = getCurrentPlaylist();
+if (repeatButton) repeatButton.addEventListener("click", toggleRepeat);
 
-  if (playlist.length === 0) {
-    alert("Danh sách hiện tại không có bài hát.");
-    return;
-  }
+if (playAllButton) {
+  playAllButton.addEventListener("click", () => {
+    const playlist = getCurrentPlaylist();
 
-  currentSongIndex = songs.indexOf(playlist[0]);
+    if (playlist.length === 0) {
+      alert("Danh sách hiện tại không có bài hát.");
+      return;
+    }
 
-  loadSong(currentSongIndex);
-  playSong();
-});
+    currentSongIndex = songs.indexOf(playlist[0]);
 
-playerFavoriteButton.addEventListener("click", () => {
-  const song = songs[currentSongIndex];
-
-  if (song) {
-    toggleFavorite(song.id);
-  }
-});
-
-audio.addEventListener("timeupdate", () => {
-  if (!audio.duration) {
-    return;
-  }
-
-  const progressPercent =
-    (audio.currentTime / audio.duration) * 100;
-
-  progress.style.width = `${progressPercent}%`;
-
-  currentTimeElement.textContent =
-    formatTime(audio.currentTime);
-
-  durationElement.textContent =
-    formatTime(audio.duration);
-});
-
-audio.addEventListener("loadedmetadata", () => {
-  durationElement.textContent =
-    formatTime(audio.duration);
-});
-
-audio.addEventListener("ended", () => {
-  if (isRepeat) {
-    audio.currentTime = 0;
+    loadSong(currentSongIndex);
     playSong();
-  } else if (isShuffle) {
-    playRandomSong();
-  } else {
-    playNextSong();
-  }
-});
+  });
+}
 
-progressContainer.addEventListener("click", event => {
-  if (!audio.duration) {
-    return;
-  }
+if (playerFavoriteButton) {
+  playerFavoriteButton.addEventListener("click", () => {
+    const song = songs[currentSongIndex];
 
-  const width = progressContainer.clientWidth;
-  const clickX = event.offsetX;
+    if (song) {
+      toggleFavorite(song.id);
+    }
+  });
+}
 
-  audio.currentTime =
-    (clickX / width) * audio.duration;
-});
+if (audio) {
+  audio.addEventListener("timeupdate", () => {
+    if (!audio.duration) {
+      return;
+    }
 
-volumeControl.addEventListener("input", () => {
-  audio.volume = volumeControl.value;
-});
+    const progressPercent = (audio.currentTime / audio.duration) * 100;
 
-searchInput.addEventListener("input", () => {
-  renderSongs();
-});
+    if (progress) progress.style.width = `${progressPercent}%`;
+    if (currentTimeElement) currentTimeElement.textContent = formatTime(audio.currentTime);
+    if (durationElement) durationElement.textContent = formatTime(audio.duration);
+  });
 
-// Lắng nghe sự kiện click chọn danh mục cho cả Desktop và Mobile
+  audio.addEventListener("loadedmetadata", () => {
+    if (durationElement) durationElement.textContent = formatTime(audio.duration);
+  });
+
+  audio.addEventListener("ended", () => {
+    if (isRepeat) {
+      audio.currentTime = 0;
+      playSong();
+    } else if (isShuffle) {
+      playRandomSong();
+    } else {
+      playNextSong();
+    }
+  });
+
+  audio.addEventListener("error", (e) => {
+    console.log("Không thể tải file nhạc này.", e);
+  });
+}
+
+if (progressContainer) {
+  progressContainer.addEventListener("click", event => {
+    if (!audio || !audio.duration) {
+      return;
+    }
+
+    const width = progressContainer.clientWidth;
+    const clickX = event.offsetX;
+
+    audio.currentTime = (clickX / width) * audio.duration;
+  });
+}
+
+if (volumeControl && audio) {
+  volumeControl.addEventListener("input", () => {
+    audio.volume = volumeControl.value;
+  });
+}
+
+if (searchInput) {
+  searchInput.addEventListener("input", () => {
+    renderSongs();
+  });
+}
+
 document.querySelectorAll(".menu-item").forEach(button => {
   button.addEventListener("click", () => {
     const category = button.dataset.category;
@@ -727,26 +724,24 @@ document.querySelectorAll(".menu-item").forEach(button => {
   });
 });
 
-saveUserButton.addEventListener("click", () => {
-  const username = usernameInput.value.trim();
+if (saveUserButton) {
+  saveUserButton.addEventListener("click", () => {
+    const username = usernameInput ? usernameInput.value.trim() : "";
 
-  if (!username) {
-    alert("Vui lòng nhập tên người dùng.");
-    return;
-  }
+    if (!username) {
+      alert("Vui lòng nhập tên người dùng.");
+      return;
+    }
 
-  currentUser = username;
+    currentUser = username;
 
-  localStorage.setItem("currentUser", currentUser);
+    localStorage.setItem("currentUser", currentUser);
 
-  renderSongs();
+    renderSongs();
 
-  alert(`Đã chuyển sang tài khoản: ${currentUser}`);
-});
-
-audio.addEventListener("error", (e) => {
-  console.log("Không thể tải file nhạc này.", e);
-});
+    alert(`Đã chuyển sang tài khoản: ${currentUser}`);
+  });
+}
 
 loadSong(currentSongIndex);
 updatePageTitle();
