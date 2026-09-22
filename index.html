@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Treasure</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  >
+</head>
+
+<body>
+  <div class="app">
+
+    <aside class="sidebar">
+      <div class="logo">
+        <i class="fa-solid fa-gem"></i>
+        <span>My Treasure</span>
+      </div>
+
+      <nav class="menu">
+        <button class="menu-item active" data-category="all">
+          <i class="fa-solid fa-layer-group"></i>
+          <span>ALL</span>
+        </button>
+
+        <button class="menu-item" data-category="music">
+          <i class="fa-solid fa-music"></i>
+          <span>MUSIC</span>
+        </button>
+
+        <button class="menu-item" data-category="podcast">
+          <i class="fa-solid fa-podcast"></i>
+          <span>PODCAST</span>
+        </button>
+
+        <button class="menu-item" data-category="liked">
+          <i class="fa-solid fa-heart"></i>
+          <span>LIKED SONGS</span>
+        </button>
+      </nav>
+
+      <div class="playlist-title">
+        <span>Thư viện bài hát</span>
+        <i class="fa-solid fa-plus"></i>
+      </div>
+
+      <div class="sidebar-list" id="sidebar-list"></div>
+    </aside>
+
+    <main class="main-content">
+
+      <header class="topbar">
+        <div class="navigation-buttons">
+          <button>
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+
+          <button>
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Tìm kiếm bài hát hoặc ca sĩ..."
+          >
+        </div>
+
+        <div class="user-box">
+          <input
+            type="text"
+            id="username-input"
+            placeholder="Tên của bạn"
+          >
+
+          <button id="save-user-button">
+            Lưu
+          </button>
+        </div>
+      </header>
+
+      <section class="content">
+        <div class="welcome">
+          <p>Chào mừng trở lại</p>
+          <h1 id="page-title">Tất cả bài hát</h1>
+        </div>
+
+        <div class="action-buttons">
+          <button class="shuffle-button" id="shuffle-button">
+            <i class="fa-solid fa-shuffle"></i>
+            Phát ngẫu nhiên
+          </button>
+
+          <button class="play-all-button" id="play-all-button">
+            <i class="fa-solid fa-play"></i>
+            Phát tất cả
+          </button>
+        </div>
+
+        <div class="song-list" id="song-list"></div>
+      </section>
+    </main>
+
+    <footer class="bottom-player">
+
+      <div class="now-playing">
+        <img id="cover" src="" alt="Album cover">
+
+        <div class="now-playing-info">
+          <strong id="title">Chưa chọn bài hát</strong>
+          <span id="artist">Hãy chọn một bài hát để phát</span>
+        </div>
+
+        <button class="favorite-button" id="player-favorite-button">
+          <i class="fa-regular fa-heart"></i>
+        </button>
+      </div>
+
+      <div class="player-center">
+        <div class="player-controls">
+
+          <button id="shuffle-control" title="Phát ngẫu nhiên">
+            <i class="fa-solid fa-shuffle"></i>
+          </button>
+
+          <button id="prev" title="Bài trước">
+            <i class="fa-solid fa-backward-step"></i>
+          </button>
+
+          <button class="play-button" id="play" title="Phát">
+            <i class="fa-solid fa-play"></i>
+          </button>
+
+          <button id="next" title="Bài tiếp theo">
+            <i class="fa-solid fa-forward-step"></i>
+          </button>
+
+          <button id="repeat-button" title="Lặp lại">
+            <i class="fa-solid fa-repeat"></i>
+          </button>
+
+        </div>
+
+        <div class="progress-area">
+          <span id="current-time">0:00</span>
+
+          <div class="progress-container" id="progress-container">
+            <div class="progress" id="progress"></div>
+          </div>
+
+          <span id="duration">0:00</span>
+        </div>
+      </div>
+
+      <div class="volume-control">
+        <i class="fa-solid fa-volume-high"></i>
+
+        <input
+          type="range"
+          id="volume"
+          min="0"
+          max="1"
+          step="0.01"
+          value="1"
+        >
+      </div>
+
+      <audio id="audio"></audio>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
