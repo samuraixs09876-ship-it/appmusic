@@ -88,6 +88,29 @@
         </div>
       </header>
 
+      <!-- Thanh chọn danh mục dành riêng cho giao diện Mobile -->
+      <nav class="mobile-menu">
+        <button class="menu-item active" data-category="all">
+          <i class="fa-solid fa-layer-group"></i>
+          <span>ALL</span>
+        </button>
+
+        <button class="menu-item" data-category="music">
+          <i class="fa-solid fa-music"></i>
+          <span>MUSIC</span>
+        </button>
+
+        <button class="menu-item" data-category="podcast">
+          <i class="fa-solid fa-podcast"></i>
+          <span>PODCAST</span>
+        </button>
+
+        <button class="menu-item" data-category="liked">
+          <i class="fa-solid fa-heart"></i>
+          <span>LIKED</span>
+        </button>
+      </nav>
+
       <section class="content">
         <div class="welcome">
           <p>Chào mừng trở lại</p>
@@ -174,7 +197,7 @@
         >
       </div>
 
-      <audio id="audio"></audio>
+      <audio id="audio" preload="metadata" playsinline></audio>
     </footer>
   </div>
 
