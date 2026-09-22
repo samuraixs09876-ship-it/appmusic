@@ -151,6 +151,11 @@ button {
   margin-top: 3px;
 }
 
+/* MOBILE MENU (Mặc định ẩn trên màn hình lớn) */
+.mobile-menu {
+  display: none;
+}
+
 /* MAIN */
 
 .main-content {
@@ -571,6 +576,36 @@ button {
 
   .sidebar {
     display: none;
+  }
+
+  /* Giao diện thanh danh mục dạng pill cuộn ngang trên Mobile */
+  .mobile-menu {
+    display: flex;
+    gap: 8px;
+    padding: 0 15px 10px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .mobile-menu .menu-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    width: auto;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: #282828;
+    color: #fff;
+    font-size: 13px;
+  }
+
+  .mobile-menu .menu-item.active {
+    background: var(--green);
+    color: #000;
+  }
+
+  .mobile-menu .menu-item.active i {
+    color: #000;
   }
 
   .topbar {
