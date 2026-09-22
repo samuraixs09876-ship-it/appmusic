@@ -92,7 +92,8 @@ const songs = [
     title: "Tháp Trap Tự Do (Remix)",
     artist: "Lý Lữ Ca prod. tyronee",
     type: "music",
-    song_url: "thttps://erztaoznustolbuaxeze.supabase.co/storage/v1/object/public/songs/thap%20trap%20tu%20do.mp3",
+    // Đã sửa lại URL bài hát này (xóa chữ 't' thừa ở đầu)
+    song_url: "https://erztaoznustolbuaxeze.supabase.co/storage/v1/object/public/songs/thap%20trap%20tu%20do.mp3",
     cover_url: "https://tse3.mm.bing.net/th/id/OIP.9W4c65IOzFz9J6oXOxii6QHaHa?r=0&pid=Api&h=220&P=0"
   },
   {
@@ -174,30 +175,6 @@ const songs = [
     type: "music",
     song_url: "https://erztaoznustolbuaxeze.supabase.co/storage/v1/object/public/songs/Charlie%20Puth%20,%20Selena%20Gomez%20-%20We%20Dont%20Talk%20%20Anymore%20%20(Lyrics).mp3",
     cover_url: "https://images.genius.com/4755e86249a7b3dd223a8aadebb53155.1000x1000x1.png"
-  },
-    {
-    id: "we-dont-talk-anymore",
-    title: "We Dont Talk Anymore",
-    artist: "Charlie Puth , Selena Gomez",
-    type: "music",
-    song_url: "https://erztaoznustolbuaxeze.supabase.co/storage/v1/object/public/songs/Charlie%20Puth%20,%20Selena%20Gomez%20-%20We%20Dont%20Talk%20%20Anymore%20%20(Lyrics).mp3",
-    cover_url: "https://images.genius.com/4755e86249a7b3dd223a8aadebb53155.1000x1000x1.png"
-  },
-    {
-    id: "we-dont-talk-anymore",
-    title: "We Dont Talk Anymore",
-    artist: "Charlie Puth , Selena Gomez",
-    type: "music",
-    song_url: "https://erztaoznustolbuaxeze.supabase.co/storage/v1/object/public/songs/Charlie%20Puth%20,%20Selena%20Gomez%20-%20We%20Dont%20Talk%20%20Anymore%20%20(Lyrics).mp3",
-    cover_url: "https://images.genius.com/4755e86249a7b3dd223a8aadebb53155.1000x1000x1.png"
-  },
-    {
-    id: "we-dont-talk-anymore",
-    title: "We Dont Talk Anymore",
-    artist: "Charlie Puth , Selena Gomez",
-    type: "music",
-    song_url: "https://erztaoznustolbuaxeze.supabase.co/storage/v1/object/public/songs/Charlie%20Puth%20,%20Selena%20Gomez%20-%20We%20Dont%20Talk%20%20Anymore%20%20(Lyrics).mp3",
-    cover_url: "https://images.genius.com/4755e86249a7b3dd223a8aadebb53155.1000x1000x1.png"
   }
 ];
 
@@ -248,7 +225,6 @@ function formatTime(time) {
   }
 
   const minutes = Math.floor(time / 60);
-
   const seconds = Math.floor(time % 60)
     .toString()
     .padStart(2, "0");
@@ -300,7 +276,6 @@ function getSongsByCategory() {
 
   if (currentCategory === "liked") {
     const likedSongs = getLikedSongs();
-
     return songs.filter(song => likedSongs.includes(song.id));
   }
 
@@ -349,7 +324,6 @@ function renderSongs() {
         Không tìm thấy bài hát phù hợp
       </div>
     `;
-
     return;
   }
 
@@ -462,7 +436,10 @@ function loadSong(index) {
   title.textContent = song.title;
   artist.textContent = song.artist;
   cover.src = song.cover_url;
+  
+  // Tải lại nhạc đúng chuẩn cho Mobile
   audio.src = song.song_url;
+  audio.load();
 
   currentTimeElement.textContent = "0:00";
   durationElement.textContent = "0:00";
@@ -511,16 +488,22 @@ function updatePlayerFavorite() {
   playerFavoriteButton.classList.toggle("liked", liked);
 }
 
+// Xử lý phát bài hát an toàn trên Mobile
 function playSong() {
-  isPlaying = true;
+  const playPromise = audio.play();
 
-  playButton.innerHTML = `
-    <i class="fa-solid fa-pause"></i>
-  `;
-
-  audio.play().catch(error => {
-    console.log("Không thể phát bài hát:", error);
-  });
+  if (playPromise !== undefined) {
+    playPromise
+      .then(() => {
+        isPlaying = true;
+        playButton.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+      })
+      .catch(error => {
+        console.log("Không thể phát nhạc tự động trên trình duyệt di động:", error);
+        isPlaying = false;
+        playButton.innerHTML = `<i class="fa-solid fa-play"></i>`;
+      });
+  }
 }
 
 function pauseSong() {
@@ -728,15 +711,16 @@ searchInput.addEventListener("input", () => {
   renderSongs();
 });
 
+// Lắng nghe sự kiện click chọn danh mục cho cả Desktop và Mobile
 document.querySelectorAll(".menu-item").forEach(button => {
   button.addEventListener("click", () => {
+    const category = button.dataset.category;
+
     document.querySelectorAll(".menu-item").forEach(item => {
-      item.classList.remove("active");
+      item.classList.toggle("active", item.dataset.category === category);
     });
 
-    button.classList.add("active");
-
-    currentCategory = button.dataset.category;
+    currentCategory = category;
 
     updatePageTitle();
     renderSongs();
@@ -760,8 +744,8 @@ saveUserButton.addEventListener("click", () => {
   alert(`Đã chuyển sang tài khoản: ${currentUser}`);
 });
 
-audio.addEventListener("error", () => {
-  console.log("Không thể tải file nhạc này.");
+audio.addEventListener("error", (e) => {
+  console.log("Không thể tải file nhạc này.", e);
 });
 
 loadSong(currentSongIndex);
